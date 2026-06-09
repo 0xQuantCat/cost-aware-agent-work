@@ -5,11 +5,13 @@
 <h1 align="center">Cost-Aware Agent Work</h1>
 
 <p align="center">
-  <b>A plain-Markdown rulebook for using AI agents without wasting premium reasoning, context, or output tokens.</b>
+  <b>A plain-Markdown rulebook for routing AI agent work by difficulty, uncertainty, and cost.</b>
 </p>
 
 <p align="center">
   <code>model-agnostic</code>
+  ·
+  <code>router-compatible</code>
   ·
   <code>no installer</code>
   ·
@@ -22,23 +24,25 @@
   <i>Use the strongest model to make the task narrow, not to do every narrow step.</i>
 </p>
 
+<p align="center">
+  <a href="skills/cost-aware-agent-work/SKILL.md"><b>Read the SKILL.md</b></a>
+</p>
+
 ---
 
 ## What this is
 
 Cost-Aware Agent Work is a small operating guide for running AI agents more efficiently.
 
-➔ [Read the skill](skills/cost-aware-agent-work/SKILL.md)
+It helps you decide:
 
-It helps separate:
-
-| High-leverage work    | Mechanical work  |
-| --------------------- | ---------------- |
-| planning              | formatting       |
-| architecture choices  | log extraction   |
-| risk analysis         | simple summaries |
-| ambiguous debugging   | bounded edits    |
-| verification strategy | final handoffs   |
+| Question | Why it matters |
+| --- | --- |
+| How hard is this task? | Difficulty should drive model choice |
+| Is the path already clear? | Clear paths do not need premium reasoning |
+| What can be executed mechanically? | Mechanical work should not burn frontier tokens |
+| When should the agent escalate? | Ambiguity, not habit, should trigger stronger reasoning |
+| What should stay stable? | Stable context is more cache-friendly |
 
 The goal is not to make agents “cheap at all costs.”
 
@@ -50,14 +54,14 @@ The goal is to spend premium reasoning only where it changes the outcome.
 
 This repo is intentionally minimal.
 
-| Not included       | Why                                              |
-| ------------------ | ------------------------------------------------ |
-| Installer          | Users should inspect the rules before using them |
-| Background process | This is a rulebook, not an agent runtime         |
-| API keys           | No provider integration required                 |
-| Telemetry          | Nothing is collected                             |
-| Hidden prompts     | Everything is plain Markdown                     |
-| Framework lock-in  | Copy the parts that fit your tool                |
+| Not included | Why |
+| --- | --- |
+| Installer | Users should inspect the rules before using them |
+| Background process | This is a rulebook, not an agent runtime |
+| API keys | No provider integration required |
+| Telemetry | Nothing is collected |
+| Hidden prompts | Everything is plain Markdown |
+| Framework lock-in | Copy the parts that fit your tool |
 
 ---
 
@@ -66,6 +70,7 @@ This repo is intentionally minimal.
 ```text
 Use premium reasoning to reduce uncertainty.
 Use cheaper execution once the path is narrow.
+Route by difficulty, not by habit.
 Escalate only when ambiguity remains.
 ```
 
@@ -78,7 +83,7 @@ plan → search → read → edit → debug → summarize → repeat
 This rulebook turns that into a more disciplined loop:
 
 ```text
-plan → execute → verify → escalate only if needed → handoff
+classify → plan → execute → verify → escalate only if needed → handoff
 ```
 
 ---
@@ -87,18 +92,63 @@ plan → execute → verify → escalate only if needed → handoff
 
 ```mermaid
 flowchart LR
-    A[Task] --> B[Plan]
-    B --> C[Execution card]
-    C --> D[Execute]
-    D --> E[Verify]
-    E --> F{Still ambiguous?}
-    F -- No --> G[Handoff]
-    F -- Yes --> H[Escalate]
-    H --> C
+    A[Task] --> B[Classify difficulty]
+    B --> C{Difficulty}
+    C -- 1-2 --> D[Cheap / low effort]
+    C -- 3 --> E[Balanced / medium]
+    C -- 4-5 --> F[Frontier / high or premium]
+    D --> G[Execute or extract]
+    E --> H[Plan or execute]
+    F --> I[Plan / resolve ambiguity]
+    I --> J[Execution card]
+    H --> J
+    J --> K[Bounded execution]
+    K --> L[Verify]
+    L --> M{Still ambiguous?}
+    M -- No --> N[Compact handoff]
+    M -- Yes --> F
 ```
+
 <p align="center">
   <i>The diagram is the intended operating loop, not a required runtime.</i>
 </p>
+
+---
+
+## Difficulty ladder
+
+Use this as a manual routing policy, or as guidance for tools that route requests across models.
+
+| Level | Difficulty | Use for | Typical mode |
+| --- | --- | --- | --- |
+| 1 | Trivial | typos, formatting, tiny rewrites, simple extraction | cheapest / low |
+| 2 | Easy | clear local edits, obvious log parsing, small cleanup | cheap / low |
+| 3 | Normal | bounded implementation, known files, ordinary debugging | balanced / medium |
+| 4 | Hard | unclear failures, multi-file reasoning, public API risk | strong / high |
+| 5 | Expert | architecture, ambiguous strategy, mergeability risk, irreversible choices | frontier / premium |
+
+The important rule:
+
+```text
+Do not route the whole task once.
+Route each phase.
+```
+
+A task may need premium reasoning for planning and cheap execution afterward.
+
+---
+
+## Manual vs automatic routing
+
+This rulebook can be used in two ways.
+
+| Mode | How it works |
+| --- | --- |
+| Manual | You classify the phase and choose the model/reasoning level yourself |
+| Router-assisted | A routing layer classifies task difficulty and sends each request to the configured model |
+| Hybrid | Use a router for easy/normal tasks, but require explicit escalation for hard or irreversible decisions |
+
+If you use a router, this skill still matters. A router needs a policy. This file defines one.
 
 ---
 
@@ -106,13 +156,14 @@ flowchart LR
 
 Use stronger reasoning where uncertainty is high. Use cheaper reasoning where the task is bounded.
 
-| Phase    | Recommended mode      | Output                           |
-| -------- | --------------------- | -------------------------------- |
-| Plan     | high / premium        | execution card                   |
-| Execute  | medium / lower effort | changes or findings              |
-| Verify   | low / medium          | test result or extracted failure |
-| Escalate | high / premium        | revised plan                     |
-| Handoff  | low / medium          | compact status summary           |
+| Phase | Recommended mode | Output |
+| --- | --- | --- |
+| Classify | cheap / medium | difficulty level |
+| Plan | high / premium | execution card |
+| Execute | medium / lower effort | changes or findings |
+| Verify | low / medium | test result or extracted failure |
+| Escalate | high / premium | revised plan |
+| Handoff | low / medium | compact status summary |
 
 ---
 
@@ -123,6 +174,7 @@ For expensive tasks, start by asking the agent to produce an execution card.
 ```text
 Execution card:
 - goal
+- difficulty level: 1-5
 - likely files or sources
 - files or sources not to touch
 - implementation or research path
@@ -130,6 +182,7 @@ Execution card:
 - verification command or evidence standard
 - definition of done
 - fallback if blocked
+- escalation triggers
 ```
 
 The execution card should be short. Its job is to reduce uncertainty, not explain everything.
@@ -142,11 +195,13 @@ Paste this at the top of expensive agent tasks:
 
 ```text
 Budget discipline:
-- one planning pass only
+- classify task difficulty before choosing effort
+- one planning pass only unless blocked
 - keep outputs compact
 - do not narrate routine work
 - use selected files or sources only
 - summarize logs before reasoning over them
+- route trivial/easy work to cheaper modes
 - escalate only if ambiguity remains
 - final response must be a concise handoff
 ```
@@ -157,15 +212,16 @@ Budget discipline:
 
 If your provider or agent runtime supports prompt caching, stable context should stay stable.
 
-| Stable prefix        | Dynamic suffix        |
-| -------------------- | --------------------- |
-| project rules        | current task          |
-| coding conventions   | latest error          |
-| quality rubric       | changed files         |
-| standing constraints | fresh test output     |
-| branch policy        | specific question     |
-| known commands       | current blocker       |
-| output format        | requested next action |
+| Stable prefix | Dynamic suffix |
+| --- | --- |
+| project rules | current task |
+| coding conventions | latest error |
+| quality rubric | changed files |
+| standing constraints | fresh test output |
+| branch policy | specific question |
+| known commands | current blocker |
+| output format | requested next action |
+| routing policy | current difficulty rating |
 
 Put reusable instructions first. Put changing task details later.
 
@@ -173,7 +229,7 @@ Put reusable instructions first. Put changing task details later.
 
 ## When to escalate
 
-Stay in medium or lower-effort mode when:
+Stay in cheap, medium, or lower-effort mode when:
 
 ```text
 target files or sources are known
@@ -181,6 +237,7 @@ failure is local
 test output is clear
 patch is small
 next action is obvious
+task is reversible
 ```
 
 Escalate to high or premium reasoning when:
@@ -192,6 +249,7 @@ tests fail for unclear reasons
 public API or irreversible behavior is involved
 wrong abstraction risk is high
 review or mergeability risk is high
+security, data loss, or production risk is involved
 ```
 
 Every escalation should have a reason.
@@ -202,16 +260,18 @@ Every escalation should have a reason.
 
 Avoid these common usage burners:
 
-| Anti-pattern                                         | Better approach                             |
-| ---------------------------------------------------- | ------------------------------------------- |
-| Highest reasoning for every step                     | Premium planning, bounded execution         |
-| Broad context rereads                                | Selected files/sources only                 |
-| Long final summaries                                 | Compact handoff                             |
-| Debugging without a plan                             | Revise the execution card                   |
-| Premium model for log cleanup                        | Extract failures with cheaper reasoning     |
-| Constant prompt rewriting                            | Keep a cache-stable prefix                  |
-| Treating advertised context as usable budget         | Track active context separately             |
+| Anti-pattern | Better approach |
+| --- | --- |
+| Highest reasoning for every step | Difficulty routing + premium planning |
+| One model for every phase | Classify each phase separately |
+| Broad context rereads | Selected files/sources only |
+| Long final summaries | Compact handoff |
+| Debugging without a plan | Revise the execution card |
+| Premium model for log cleanup | Extract failures with cheaper reasoning |
+| Constant prompt rewriting | Keep a cache-stable prefix |
+| Treating advertised context as usable budget | Track active context separately |
 | Treating cumulative billed tokens as current context | Separate billing, cache, and active context |
+| Blind automation loops | Add escalation gates and stop conditions |
 
 ---
 
@@ -244,6 +304,25 @@ other tool-specific instruction files
 ```
 
 Use only the parts that fit your workflow.
+
+---
+
+## Router compatibility
+
+This repo does not install or require a router.
+
+It pairs naturally with router tools because it defines the missing policy layer:
+
+```text
+difficulty classification
+model ladder
+escalation gates
+compact handoff format
+anti-loop rules
+cache-stable prompt layout
+```
+
+If you use a router, configure it to send low-difficulty work to cheaper models and reserve frontier models for planning, ambiguity, and high-risk decisions.
 
 ---
 
