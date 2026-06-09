@@ -1,63 +1,235 @@
-# Cost-Aware Agent Work
+<p align="center">
+  <img src="assets/thumbnail.png" width="1000" alt="Cost-Aware Agent Work thumbnail">
+</p>
 
-A small, model-agnostic skill/rulebook for reducing waste in AI agent workflows.
+<h1 align="center">Cost-Aware Agent Work</h1>
 
-It teaches agents to:
+<p align="center">
+  <b>A plain-Markdown rulebook for using AI agents without wasting premium reasoning, context, or output tokens.</b>
+</p>
+
+<p align="center">
+  <code>model-agnostic</code>
+  ·
+  <code>no installer</code>
+  ·
+  <code>no telemetry</code>
+  ·
+  <code>copy-paste friendly</code>
+</p>
+
+<p align="center">
+  <i>Use the strongest model to make the task narrow, not to do every narrow step.</i>
+</p>
+
+---
+
+## What this is
+
+Cost-Aware Agent Work is a small operating guide for running AI agents more efficiently.
+
+It helps separate:
+
+| High-leverage work    | Mechanical work  |
+| --------------------- | ---------------- |
+| planning              | formatting       |
+| architecture choices  | log extraction   |
+| risk analysis         | simple summaries |
+| ambiguous debugging   | bounded edits    |
+| verification strategy | final handoffs   |
+
+The goal is not to make agents “cheap at all costs.”
+
+The goal is to spend premium reasoning only where it changes the outcome.
+
+---
+
+## What this is not
+
+This repo is intentionally minimal.
+
+| Not included       | Why                                              |
+| ------------------ | ------------------------------------------------ |
+| Installer          | Users should inspect the rules before using them |
+| Background process | This is a rulebook, not an agent runtime         |
+| API keys           | No provider integration required                 |
+| Telemetry          | Nothing is collected                             |
+| Hidden prompts     | Everything is plain Markdown                     |
+| Framework lock-in  | Copy the parts that fit your tool                |
+
+---
+
+## Core principle
 
 ```text
-plan with premium reasoning
-execute bounded work with cheaper reasoning
-control output
-preserve cache-stable context
-escalate only on ambiguity
-produce compact handoffs
+Use premium reasoning to reduce uncertainty.
+Use cheaper execution once the path is narrow.
+Escalate only when ambiguity remains.
 ```
 
-## Why this exists
-
-Many users burn through weekly AI usage by using the strongest reasoning mode for every phase of work:
+Most usage waste comes from running the strongest model through every phase:
 
 ```text
-planning
-searching
-reading
-editing
-debugging
-formatting
-summarizing
+plan → search → read → edit → debug → summarize → repeat
 ```
 
-This rulebook separates high-leverage reasoning from mechanical execution.
-
-## Files
+This rulebook turns that into a more disciplined loop:
 
 ```text
-skills/cost-aware-agent-work/SKILL.md
-README.md
+plan → execute → verify → escalate only if needed → handoff
 ```
 
-## Install
+---
 
-There is no executable installer. Review the file before use.
+## Workflow
 
-### Option A — Clone and copy the skill
+```mermaid
+flowchart LR
+    A[Task] --> B[Plan]
+    B --> C[Execution card]
+    C --> D[Execute]
+    D --> E[Verify]
+    E --> F{Still ambiguous?}
+    F -- No --> G[Handoff]
+    F -- Yes --> H[Escalate]
+    H --> C
+```
+
+---
+
+## The model ladder
+
+Use stronger reasoning where uncertainty is high. Use cheaper reasoning where the task is bounded.
+
+| Phase    | Recommended mode      | Output                           |
+| -------- | --------------------- | -------------------------------- |
+| Plan     | high / premium        | execution card                   |
+| Execute  | medium / lower effort | changes or findings              |
+| Verify   | low / medium          | test result or extracted failure |
+| Escalate | high / premium        | revised plan                     |
+| Handoff  | low / medium          | compact status summary           |
+
+---
+
+## Execution card
+
+For expensive tasks, start by asking the agent to produce an execution card.
+
+```text
+Execution card:
+- goal
+- likely files or sources
+- files or sources not to touch
+- implementation or research path
+- risks
+- verification command or evidence standard
+- definition of done
+- fallback if blocked
+```
+
+The execution card should be short. Its job is to reduce uncertainty, not explain everything.
+
+---
+
+## Budget header
+
+Paste this at the top of expensive agent tasks:
+
+```text
+Budget discipline:
+- one planning pass only
+- keep outputs compact
+- do not narrate routine work
+- use selected files or sources only
+- summarize logs before reasoning over them
+- escalate only if ambiguity remains
+- final response must be a concise handoff
+```
+
+---
+
+## Cache-stable prompt layout
+
+If your provider or agent runtime supports prompt caching, stable context should stay stable.
+
+| Stable prefix        | Dynamic suffix        |
+| -------------------- | --------------------- |
+| project rules        | current task          |
+| coding conventions   | latest error          |
+| quality rubric       | changed files         |
+| standing constraints | fresh test output     |
+| branch policy        | specific question     |
+| known commands       | current blocker       |
+| output format        | requested next action |
+
+Put reusable instructions first. Put changing task details later.
+
+---
+
+## When to escalate
+
+Stay in medium or lower-effort mode when:
+
+```text
+target files or sources are known
+failure is local
+test output is clear
+patch is small
+next action is obvious
+```
+
+Escalate to high or premium reasoning when:
+
+```text
+architecture choice is unclear
+multiple subsystems conflict
+tests fail for unclear reasons
+public API or irreversible behavior is involved
+wrong abstraction risk is high
+review or mergeability risk is high
+```
+
+Every escalation should have a reason.
+
+---
+
+## Anti-patterns
+
+Avoid these common usage burners:
+
+| Anti-pattern                                         | Better approach                             |
+| ---------------------------------------------------- | ------------------------------------------- |
+| Highest reasoning for every step                     | Premium planning, bounded execution         |
+| Broad context rereads                                | Selected files/sources only                 |
+| Long final summaries                                 | Compact handoff                             |
+| Debugging without a plan                             | Revise the execution card                   |
+| Premium model for log cleanup                        | Extract failures with cheaper reasoning     |
+| Constant prompt rewriting                            | Keep a cache-stable prefix                  |
+| Treating advertised context as usable budget         | Track active context separately             |
+| Treating cumulative billed tokens as current context | Separate billing, cache, and active context |
+
+---
+
+## Install / use
+
+There is no executable installer.
+
+Clone the repo:
 
 ```bash
 git clone https://github.com/0xQuantCat/cost-aware-agent-work.git
 cd cost-aware-agent-work
 ```
 
-Then copy:
+Then read and copy:
 
 ```text
 skills/cost-aware-agent-work/SKILL.md
 ```
 
-into the skill/location supported by your agent tool.
+into the skill or instruction location supported by your agent tool.
 
-### Option B — Use as a repo-level instruction
-
-Copy the relevant rules into your project’s agent instruction file, such as:
+You can also copy the relevant rules into project-level instruction files such as:
 
 ```text
 AGENTS.md
@@ -66,27 +238,28 @@ CLAUDE.md
 other tool-specific instruction files
 ```
 
-Use the parts that match your workflow.
+Use only the parts that fit your workflow.
 
-### Option C — Manual paste
+---
 
-Paste the `Budget Header Template` into the top of expensive agent tasks.
-
-## Suggested article CTA
+## Repository structure
 
 ```text
-I put the checklist in a small repo.
-
-Clone it, read the SKILL.md, and copy it into your agent/tool setup.
-
-No installer. No background process. Just a rulebook for cost-aware agent work.
+cost-aware-agent-work/
+├── README.md
+├── LICENSE
+├── assets/
+│   └── thumbnail.png
+└── skills/
+    └── cost-aware-agent-work/
+        └── SKILL.md
 ```
 
-## Safety
+---
 
-This repository should contain no executable automation by default.
+## Safety posture
 
-Recommended constraints:
+This repo is intentionally plain Markdown.
 
 ```text
 no install script
@@ -97,7 +270,23 @@ no telemetry
 no hidden prompts
 ```
 
-The skill is intentionally plain Markdown so users can inspect it before using it.
+Read the skill before using it. Copy only what you trust.
+
+---
+
+## Suggested article CTA
+
+```text
+I put the checklist in a small public repo:
+
+github.com/0xQuantCat/cost-aware-agent-work
+
+Clone it, read the SKILL.md, and copy it into your agent/tool setup.
+
+No installer. No background process. Just a plain Markdown rulebook for cost-aware agent work.
+```
+
+---
 
 ## License
 
