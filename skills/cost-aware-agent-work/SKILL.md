@@ -4,6 +4,8 @@ Use this skill when the user wants an AI agent to complete a coding, research, w
 
 This skill is model-agnostic. It does not require external tools, API keys, shell scripts, network access, telemetry, or repo-specific knowledge.
 
+It can be used manually, inside a custom harness, or alongside optional routing tools such as Switchboard or any similar model-routing system. Do not assume such a tool is installed.
+
 ## Core Rule
 
 ```text
@@ -82,7 +84,7 @@ Use this 1-5 scale to decide effort.
   use frontier / premium effort
 ```
 
-If the agent is unsure between two levels, choose the lower level for reversible work and the higher level for irreversible or high-risk decisions.
+If unsure between two levels, choose the lower level for reversible work and the higher level for irreversible or high-risk decisions.
 
 ## Pricing Mental Model
 
@@ -109,9 +111,20 @@ escalate reasoning only when uncertainty remains
 
 Do not claim exact savings unless the user provides actual provider pricing and usage telemetry.
 
-## Router Compatibility
+## Optional Router Compatibility
 
-This skill can be used manually or with a model-routing layer.
+This skill is a routing policy, not a router.
+
+It may be used with:
+
+```text
+manual model selection
+a custom local harness
+Switchboard
+any similar paid or free model-router tool
+```
+
+Do not require or assume any specific router.
 
 Manual mode:
 
@@ -124,7 +137,7 @@ Router-assisted mode:
 
 ```text
 a routing layer maps difficulty levels to models
-the agent still follows this skill's output and escalation policy
+the agent still follows this skill's output, escalation, and stop policy
 ```
 
 Hybrid mode:
@@ -320,7 +333,7 @@ Budget discipline:
 - do not narrate routine work
 - use selected files/sources only
 - summarize logs before reasoning over them
-- route trivial/easy work to cheaper modes
+- route trivial/easy work to cheaper modes when available
 - escalate only if ambiguity remains
 - final response must be a concise handoff
 ```
