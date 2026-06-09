@@ -43,7 +43,7 @@ There is no executable installer. Review the file before use.
 ### Option A — Clone and copy the skill
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/cost-aware-agent-work.git
+git clone https://github.com/0xQuantCat/cost-aware-agent-work.git
 cd cost-aware-agent-work
 ```
 
@@ -101,4 +101,4 @@ The skill is intentionally plain Markdown so users can inspect it before using i
 
 ## License
 
-MIT or CC0 recommended.
+MIT.
