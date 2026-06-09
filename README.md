@@ -38,7 +38,7 @@ It helps you decide:
 
 | Question | Why it matters |
 | --- | --- |
-| How hard is this task? | Difficulty should drive model choice |
+| How hard is this task? | Difficulty should influence model choice |
 | Is the path already clear? | Clear paths do not need premium reasoning |
 | What can be executed mechanically? | Mechanical work should not burn frontier tokens |
 | When should the agent escalate? | Ambiguity, not habit, should trigger stronger reasoning |
@@ -96,10 +96,10 @@ flowchart LR
     B --> C{Difficulty}
     C -- 1-2 --> D[Cheap / low effort]
     C -- 3 --> E[Balanced / medium]
-    C -- 4-5 --> F[Frontier / high or premium]
+    C -- 4-5 --> F[Strong / premium]
     D --> G[Execute or extract]
     E --> H[Plan or execute]
-    F --> I[Plan / resolve ambiguity]
+    F --> I[Resolve uncertainty]
     I --> J[Execution card]
     H --> J
     J --> K[Bounded execution]
@@ -134,25 +134,32 @@ Do not route the whole task once.
 Route each phase.
 ```
 
-A task may need premium reasoning for planning and cheap execution afterward.
+A task may need premium reasoning for planning and cheaper execution afterward.
 
 ---
 
-## Manual vs automatic routing
+## Optional routing tools
 
-This rulebook can be used in two ways.
+This repo does **not** require a router.
 
-| Mode | How it works |
+It can be used manually, inside a custom harness, or alongside an optional routing tool.
+
+Examples of compatible approaches:
+
+| Approach | What it does |
 | --- | --- |
-| Manual | You classify the phase and choose the model/reasoning level yourself |
-| Router-assisted | A routing layer classifies task difficulty and sends each request to the configured model |
-| Hybrid | Use a router for easy/normal tasks, but require explicit escalation for hard or irreversible decisions |
+| Manual routing | You choose the model/reasoning level using the difficulty ladder |
+| Custom harness | Your own script maps difficulty to model choice |
+| Switchboard or similar tools | A paid/third-party router can send easy tasks to cheaper models and hard tasks to frontier models |
+| Hybrid | Use routing for routine work, but require explicit escalation for high-risk decisions |
 
-If you use a router, this skill still matters. A router needs a policy. This file defines one.
+The rulebook is the policy layer. A router is only an implementation option.
+
+Do not depend on any paid routing service unless it fits your workflow, budget, privacy needs, and toolchain.
 
 ---
 
-## The model ladder
+## Model ladder
 
 Use stronger reasoning where uncertainty is high. Use cheaper reasoning where the task is bounded.
 
@@ -201,7 +208,7 @@ Budget discipline:
 - do not narrate routine work
 - use selected files or sources only
 - summarize logs before reasoning over them
-- route trivial/easy work to cheaper modes
+- route trivial/easy work to cheaper modes when available
 - escalate only if ambiguity remains
 - final response must be a concise handoff
 ```
@@ -309,9 +316,9 @@ Use only the parts that fit your workflow.
 
 ## Router compatibility
 
-This repo does not install or require a router.
+This repo does not install, require, or endorse a specific router.
 
-It pairs naturally with router tools because it defines the missing policy layer:
+It pairs naturally with routing systems because it defines the missing policy layer:
 
 ```text
 difficulty classification
@@ -322,7 +329,7 @@ anti-loop rules
 cache-stable prompt layout
 ```
 
-If you use a router, configure it to send low-difficulty work to cheaper models and reserve frontier models for planning, ambiguity, and high-risk decisions.
+If you use Switchboard or any similar router, configure it to reserve frontier models for ambiguity, planning, and high-risk decisions, while sending reversible low-difficulty work to cheaper models.
 
 ---
 
