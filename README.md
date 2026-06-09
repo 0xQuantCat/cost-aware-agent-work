@@ -28,6 +28,8 @@
 
 Cost-Aware Agent Work is a small operating guide for running AI agents more efficiently.
 
+➔ [Read the skill](skills/cost-aware-agent-work/SKILL.md)
+
 It helps separate:
 
 | High-leverage work    | Mechanical work  |
@@ -94,6 +96,9 @@ flowchart LR
     F -- Yes --> H[Escalate]
     H --> C
 ```
+<p align="center">
+  <i>The diagram is the intended operating loop, not a required runtime.</i>
+</p>
 
 ---
 
@@ -221,7 +226,7 @@ git clone https://github.com/0xQuantCat/cost-aware-agent-work.git
 cd cost-aware-agent-work
 ```
 
-Then read and copy:
+Then read and copy the skill file:
 
 ```text
 skills/cost-aware-agent-work/SKILL.md
